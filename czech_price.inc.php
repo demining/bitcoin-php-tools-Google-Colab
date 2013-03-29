@@ -17,21 +17,21 @@ class CzechPrice
         $this->validity = $validity;
     }
 
-	/*
-	*	Convert CZK price to BTC price
-	*/
-	public function czk_to_btc($v, $decimal_places=3)
-	{
-    	return round($v / $this->get_price(), $decimal_places);
-	}
+    /*
+    *	Convert CZK price to BTC price
+    */
+    public function czk_to_btc($v, $decimal_places=3)
+    {
+        return round($v / $this->get_price(), $decimal_places);
+    }
     
     /*
-	*	Convert BTC price to CZK price
-	*/
-	public function btc_to_czk($v, $decimal_places=2)
-	{
-    	return round($v * $this->get_price(), $decimal_places);
-	}   
+    *	Convert BTC price to CZK price
+    */
+    public function btc_to_czk($v, $decimal_places=2)
+    {
+        return round($v * $this->get_price(), $decimal_places);
+    }   
     
     /**
     *	Load price from local cache or remote servers
@@ -67,17 +67,17 @@ class CzechPrice
         if ($this->price !== null) return $this->price;
         
     	// Fail if we have no cache file
-		if(!file_exists($this->cache_file)) return null;
+        if(!file_exists($this->cache_file)) return null;
 		
-		// Load structure from file
-		$data = file_get_contents($this->cache_file);
-		$data = json_decode($data, true);
+        // Load structure from file
+        $data = file_get_contents($this->cache_file);
+        $data = json_decode($data, true);
 		
-		// Check if cached price is still valid
-		if((time() - $data['timestamp']) > $this->validity) return null;
+        // Check if cached price is still valid
+        if((time() - $data['timestamp']) > $this->validity) return null;
 		
-		$this->price = $data['price'];
-		return $this->price;    
+        $this->price = $data['price'];
+        return $this->price;    
     }
     
     protected function _cache_save($price)
@@ -99,26 +99,25 @@ class CzechPrice
         return (float)$data['ticker']['last'];
     }
 
-	/*
-	*	Return price of USD in CZK
-	*/
-	protected function _get_cnb()
-	{
+    /*
+    *  Return price of USD in CZK
+    */
+    protected function _get_cnb()
+    {
     	$data = $this->_get_url('http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt');
-	    $dollar = null;
-	    foreach(explode("\n", $data) as $line)
-	    {
-	        $cols = explode("|", $line);
-	        
-	        if (count($cols)<3 || $cols[3] != 'USD') continue;
+        $dollar = null;
+        foreach(explode("\n", $data) as $line)
+        {
+            $cols = explode("|", $line);
+	    
+            if (count($cols)<3 || $cols[3] != 'USD') continue;
 	
-	        $dollar = (float)str_replace(',', '.', $cols[4]);
-	    }
+            $dollar = (float)str_replace(',', '.', $cols[4]);
+        }
 	    
-	    if(!$dollar) throw new Exception("Error during retrieving data from CNB, please try again");
-	    
-	    return $dollar;
-	}
+        if(!$dollar) throw new Exception("Error during retrieving data from CNB, please try again");	    
+        return $dollar;
+    }
 	    
     protected function _get_url($url)
     {

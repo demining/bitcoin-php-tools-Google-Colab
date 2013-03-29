@@ -1,4 +1,4 @@
 bitcoin-php-tools
 =================
 
-Various bitcoin tools for PHP
+Simple PHP classes for handling bitcoins.

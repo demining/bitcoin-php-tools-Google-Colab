@@ -46,8 +46,15 @@ class CzechPrice
     	if($price === null)
     	{
     		// Refreshing price from servers
-    		$price = $this->get_fresh_price();
-    		$this->_cache_save($price);
+    	    try
+    	    {
+    		    $price = $this->get_fresh_price();
+    		    $this->_cache_save($price);
+    		} catch (Exception $e) {
+    		    
+    		    // Check failed, try to load outdated price from cache
+    		    $price = $this->_cache_load(false);    		
+    		}
     	}
     	
     	if ($price === null) throw new Exception("Cannot check current price");
@@ -62,7 +69,7 @@ class CzechPrice
     	return $this->_get_mtgox() * $this->_get_cnb();
     }
     
-    protected function _cache_load()
+    protected function _cache_load($check_timestamp=true)
     {
         if ($this->price !== null) return $this->price;
         
@@ -72,10 +79,10 @@ class CzechPrice
         // Load structure from file
         $data = file_get_contents($this->cache_file);
         $data = json_decode($data, true);
-		
+				
         // Check if cached price is still valid
-        if((time() - $data['timestamp']) > $this->validity) return null;
-		
+        if($check_timestamp && (time() - $data['timestamp']) > $this->validity) return null;
+        
         $this->price = $data['price'];
         return $this->price;    
     }
